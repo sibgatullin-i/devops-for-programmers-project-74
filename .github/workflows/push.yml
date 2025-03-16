@@ -24,7 +24,7 @@ jobs:
               uses: docker/build-push-action@v3
               with:
                 context: app
-                file: app/Dockerfile.production
+                file: Dockerfile.production
                 push: false
                 tags: ${{ env.APP_IMAGE_NAME }}:latest
                 load: true
@@ -40,4 +40,4 @@ jobs:
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
             
             - name: Push image
-              run: docker push ${{ vars.APP_IMAGE_NAME }}:latest
+              run: docker push ${{ env.APP_IMAGE_NAME }}:latest
