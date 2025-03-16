@@ -9,35 +9,59 @@ env:
   APP_IMAGE_NAME: isayli/devops-for-programmers-project-74
 
 jobs:
-    build:
+    check:
+      name: Check code
+      runs-on: ubuntu-latest
+      permissions:
+        packages: write
+        contents: read
+        attestations: write
+        id-token: write
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v4
+          
+        - name: Buil project
+          run: docker compose -f docker-compose.yml -f docker-compose.override.yml run --rm app make setup
+          
+        - name: Test project
+          run: docker compose -f docker-compose.yml -f docker-compose.override.yml run --rm app make prepare-env test
+
+    build_and_push:
+        name: Push Docker image to Docker Hub
         runs-on: ubuntu-latest
+        permissions:
+          packages: write
+          contents: read
+          attestations: write
+          id-token: write
         steps:
-            - uses: actions/checkout@v3
+            - name: Check out the repo
+              uses: actions/checkout@v4
 
-            - name: Install Docker Compose
-              run: |
-                sudo curl -L "https://github.com/docker/compose/releases/download/v2.32.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-                sudo chmod +x /usr/local/bin/docker-compose
-                docker-compose --version
-
-            - name: Build image without push
-              uses: docker/build-push-action@v3
-              with:
-                context: app
-                file: Dockerfile.production
-                push: false
-                tags: ${{ env.APP_IMAGE_NAME }}:latest
-                load: true
-
-            - name: Run tests
-              working-directory: app
-              run: make ci    
-            
-            - name: Login Dockerhub
+            - name: Log in to Docker Hub
               uses: docker/login-action@v3
               with:
                 username: ${{ vars.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
-            
-            - name: Push image
-              run: docker push ${{ env.APP_IMAGE_NAME }}:latest
+                password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ env.APP_IMAGE_NAME }}:latest
+                tags: |
+                  type=semver,pattern={{version}}
+                  type=raw,value=latest,enable={{is_default_branch}}
+                  type=ref,event=branch,enable=${{ github.ref != format('refs/heads/{0}', 'master') }}    
+
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@v6
+              with:
+                context: .
+                file: ./Dockerfile.production
+                push: true
+                tags: ${{ steps.meta.outputs.tags }}
+                labels: ${{ steps.meta.outputs.labels }}                        
+  
