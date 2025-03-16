@@ -2,6 +2,6 @@ services:
   app:
     image: isayli/devops-for-programmers-project-74
     build:
-      context: .
       dockerfile: Dockerfile.production
+      context: .
     command: make test
