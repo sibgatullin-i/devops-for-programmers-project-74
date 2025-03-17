@@ -44,7 +44,7 @@ jobs:
           echo POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
           echo POSTGRES_DB=postgres >> .env
       - name: Run test
-        run: make compose-ci
+        run: make tests
 
   push:
     needs: test
