@@ -6,6 +6,3 @@ build:
 
 run:
 	docker-compose -f docker-compose.yml -f docker-compose.override.yml up
-
-setup:
-	docker-compose run --rm app npm ci
