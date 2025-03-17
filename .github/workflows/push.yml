@@ -26,7 +26,7 @@ jobs:
           context: .
           file: ./Dockerfile.production
           push: true
-          tags: lodo4ka/devops-for-programmers-project-74:latest
+          tags: isayli/devops-for-programmers-project-74:latest
 
   test:
     needs: build
@@ -59,4 +59,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: isayli/devops-for-programmers-project-74
+          tags: isayli/devops-for-programmers-project-74:latest
