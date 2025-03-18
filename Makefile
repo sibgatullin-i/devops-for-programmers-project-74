@@ -1,11 +1,11 @@
-tests:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml run --rm app make prepare-env test
+compose-ci:
+	docker-compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
 
-build:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml run --rm app make setup
+compose-build:
+	docker-compose -f docker-compose.yml build app
 
-run:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+docker-drop-containers:
+	docker-compose down
 
-ci:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml run --rm app npm ci
+test:
+	sleep 5 && npm test

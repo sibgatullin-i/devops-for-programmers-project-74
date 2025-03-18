@@ -7,10 +7,10 @@
       "node": ">=20.x"
    },
    "scripts": {
-      "migrate": "npx sequelize db:migrate",
+      "migrate": "sequelize db:migrate",
       "prebuild": "rm -rf dist",
       "build": "webpack",
-      "pretest": "npx sequelize db:migrate:undo && npm run migrate",
+      "pretest": "sequelize db:migrate:undo && npm run migrate",
       "test": "jest --verbose --runInBand",
       "prestart": "npm run migrate",
       "start": "fastify start -a 0.0.0.0 -p 8080 server/plugin.js -l debug -P -o",
@@ -66,6 +66,7 @@
       "pug": "^3.0.2",
       "qs": "^6.12.1",
       "sequelize": "^6.37.3",
+      "sequelize-cli": "^6.6.2",
       "sqlite3": "^5.1.7",
       "webpack": "^5.91.0"
    },
@@ -84,7 +85,6 @@
       "jest": "^29.7.0",
       "jest-cli": "^29.7.0",
       "pino-pretty": "^11.0.0",
-      "sequelize-cli": "^6.6.2",
       "style-loader": "^4.0.0",
       "webpack-cli": "^5.1.4"
    }

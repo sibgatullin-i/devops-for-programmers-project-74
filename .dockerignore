@@ -1,4 +1,1 @@
-app/node_modules/
-app/dist/
-app/.env
-app/*.sqlite
+/node_modules
