@@ -1,24 +1,20 @@
 services:
   app:
+    image: app:local
     build:
-      context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    command: make dev
     volumes:
-      - './app:/app'
-    command: 'bash -c "sleep 3 && npm start"'
-
+      - "./app:/app"
   caddy:
-    depends_on:
-      - app
-    image: caddy:2.7.6
-    restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
+    image: caddy:2.6
+    restart: always
+    volumes:
+      - "./services/caddy/Caddyfile:/etc/caddy/Caddyfile"
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp"
-    volumes:
-      - './services/caddy/Caddyfile:/etc/caddy/Caddyfile'
+    depends_on:
+      - app

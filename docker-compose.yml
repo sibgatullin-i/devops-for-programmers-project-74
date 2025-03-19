@@ -1,34 +1,32 @@
-version: '3'
-
+version: "3"
 services:
   app:
-    build:
-      context: ./
-      dockerfile: Dockerfile.production
-    environment:
-      DATABASE_PASSWORD: postgres
-      DATABASE_USERNAME: postgres
-      DATABASE_NAME: postgres
-      DATABASE_PORT: localhost
-      DATABASE_HOST: 5432
-    depends_on:
-      - db
     image: isayli/devops-for-programmers-project-74
-    ports:
-      - "8080:8080"
-    command: bash -c 'sleep 3 && npm test'
-
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    command: make test
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
   db:
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    image: postgres:16.2
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-
-volumes:
-  pgdata:
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
